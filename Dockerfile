@@ -1,6 +1,6 @@
-FROM node:20.19.5-alpine3.22 as build
+FROM node:20.19.5-alpine3.22 As build
 WORKDIR /opt/server
-COPY package.js .
+COPY package.json .
 COPY *.js .
 RUN npm install
 
@@ -8,7 +8,7 @@ FROM node:20.19.5-alpine3.22
 WORKDIR /opt/server
 RUN addgroup -s roboshop && adduser -s roboshop -g roboshop && \
     chown -R roboshop:roboshop /opt/server
-EXPOSE 80:80
+EXPOSE 80
 LABEL com.project="roboshop" \
       component="catalogue" \
       created_by="Rohith"
