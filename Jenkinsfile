@@ -9,17 +9,17 @@ pipeline {
         COURSE="jenkins"
         appVersion = ""
     }
-    options {
-        timeout(time: 10, unit: 'MINUTES')
-        disableConcurrentBuilds()
-    }
+    // options {
+    //     timeout(time: 10, unit: 'MINUTES')
+    //     disableConcurrentBuilds()
+    // }
     // This are Build steps
     stages {
         stage('Read Version'){
             steps{
                 script{
                     
-                    def packageJSON = readJSON file: 'catalogue/package.json'
+                    def packageJSON = readJSON file: 'package.json'
                     appVersion = packageJSON.version
                     echo "app version: ${appVersion}"
                     
