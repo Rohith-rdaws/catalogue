@@ -36,7 +36,6 @@ pipeline {
                 }
             }
         }
-
         stage('Build Image') {
             steps {
                 script{
@@ -46,11 +45,12 @@ pipeline {
                             docker build 376798132299.dkr.ecr.us-east-1.amazonaws.com/${project}/${component}:${appVersion}
                             docker images
                             docker push ${ACC_ID}.dkr.ecr.us-east-1.amazonaws.com/${project}/${component}:${appVersion}
-                    """
+                        """
                     }
                 }
             }
         }
+    }
     post{
         always{
             echo 'I will always say Hello again!'
