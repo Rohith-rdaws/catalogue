@@ -1,81 +1,63 @@
 pipeline {
-    // This are pre-build steps
+    // These are pre-build sections
     agent {
-        node{
-            label 'Agent-1'
+        node {
+            label 'AGENT-1'
         }
     }
     environment {
-        COURSE="jenkins"
+        COURSE = "Jenkins"
         appVersion = ""
     }
     options {
-        timeout(time: 10, unit: 'MINUTES')
+        timeout(time: 10, unit: 'MINUTES') 
         disableConcurrentBuilds()
     }
-    This are Build steps
+    // This is build section
     stages {
-        stage('Read Version'){
-            steps{
+        stage('Read Version') {
+            steps {
                 script{
-                    
                     def packageJSON = readJSON file: 'package.json'
                     appVersion = packageJSON.version
                     echo "app version: ${appVersion}"
-                    
                 }
-            }   
+            }
         }
         stage('Install Dependencies') {
             steps {
-                script {
+                script{
                     sh """
                         npm install
                     """
                 }
             }
         }
+
         stage('Build Image') {
             steps {
-                script {
-                    sh """
-                        docker build -t catalogue: ${appVersion} .
-                        docker images
-                    """
-                }
-            }
-        }
-        stage('Test'){
-            steps{
                 script{
-                    sh """
-                        echo "testing"
-                    """
+                        sh """
+                            docker build -t catalogue:${appVersion} .
+                            docker images
+                        """
+                    }
                 }
             }
         }
-        stage('Deploy'){
-            steps{
-                script{
-                    sh """
-                        echo "deploying"
-                    """
-                }
-                
-            }
-        }
-    }
-    // This are post build steps
-    post {
-        always {
-            echo "I'm the end"
+    post{
+        always{
+            echo 'I will always say Hello again!'
             cleanWs()
         }
-        success{
-            echo    "Im the success"
+        success {
+            echo 'I will run if success'
         }
-        failure{
-            echo    "im the failure"
+        failure {
+            echo 'I will run if failure'
+        }
+        aborted {
+            echo 'pipeline is aborted'
         }
     }
 }
