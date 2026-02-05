@@ -119,7 +119,22 @@ pipeline {
                     fi
                 '''
             }
-}
+        }
+        stage('Trivy scan'){
+            steps{
+                script{
+                    sh """
+                        trivy image \
+                        --scanner vuln \
+                        --severity HIGH,CRITICAL,MEDIUM \
+                        --exit-code 1 \
+                        --skip-db-update \
+                        --format table \
+                        ${ACC_ID}.dkr.ecr.us-east-1.amazonaws.com/${PROJECT}/${COMPONENT}:${appVersion}
+                    """
+                }
+            }
+        }
 
     }
     post{
