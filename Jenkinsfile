@@ -1,8 +1,8 @@
 @Library('Jenkins-shared-library') _
 
-def configMap =[
-    project = "roboshop",
-    component = "catalogue"
+def configMap = [
+    project: "roboshop",
+    component: "catalogue"
 ]
 
 // if branch is not equal to branch then execute CI
