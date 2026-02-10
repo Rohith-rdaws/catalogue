@@ -32,6 +32,14 @@ pipeline {
                 }
             }
         }
+        stages {
+            stage('Docker Test') {
+                steps {
+                    sh 'docker version'
+                }
+            }
+        }
+
         // stage('Install Dependencies') {
         //     steps {
         //         script{
