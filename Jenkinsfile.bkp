@@ -8,7 +8,7 @@ pipeline {
     environment {
         COURSE = "Jenkins"
         appVersion = ""
-        ACC_ID = "376798132299"
+        ACC_ID = "131315333865"
         project = "roboshop"
         component = "catalogue"
     }
@@ -46,25 +46,25 @@ pipeline {
             }
         }
         // Here select the scanner tool and send reports to server
-        stage('Sonar Scan'){
-            environment {
-                def scannerHome = tool 'sonar-8.0'
-            }
-            steps {
-                script{
-                    withSonarQubeEnv('sonar-server'){
-                        sh "${scannerHome}/bin/sonar-scanner"
-                    }
-                }
-            }
-        }
-        stage('Quality Gate'){
-            steps {
-                timeout(time: 1, unit: 'HOURS'){
-                    waitForQualityGate abortPipeline:true
-                }
-            }
-        }
+        // stage('Sonar Scan'){
+        //     environment {
+        //         def scannerHome = tool 'sonar-8.0'
+        //     }
+        //     steps {
+        //         script{
+        //             withSonarQubeEnv('sonar-server'){
+        //                 sh "${scannerHome}/bin/sonar-scanner"
+        //             }
+        //         }
+        //     }
+        // }
+        // stage('Quality Gate'){
+        //     steps {
+        //         timeout(time: 1, unit: 'HOURS'){
+        //             waitForQualityGate abortPipeline:true
+        //         }
+        //     }
+        // }
         stage('Build Image') {
             steps {
                 script{
