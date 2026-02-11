@@ -32,30 +32,25 @@ pipeline {
                 }
             }
         }
-        stage('Docker Test') {
+        
+        stage('Install Dependencies') {
             steps {
-                sh 'docker ps'
+                script{
+                    sh """
+                        npm install
+                    """
+                }
             }
         }
-
-        // stage('Install Dependencies') {
-        //     steps {
-        //         script{
-        //             sh """
-        //                 npm install
-        //             """
-        //         }
-        //     }
-        // }
-        // stage('Unit Test') {
-        //     steps {
-        //         script{
-        //             sh """
-        //                 npm test
-        //             """
-        //         }
-        //     }
-        // }
+        stage('Unit Test') {
+            steps {
+                script{
+                    sh """
+                        npm test
+                    """
+                }
+            }
+        }
         // Here select the scanner tool and send reports to server
         // stage('Sonar Scan'){
         //     environment {
@@ -91,62 +86,62 @@ pipeline {
                 }
             }
         }
-        // stage('Dependabot Alerts') {
-        //     environment {
-        //         GITHUB_TOKEN = credentials('github-token')
-        //         GIT_OWNER = 'rohith1845'
-        //         GITHUB_API = 'https://api.github.com'
-        //         GITHUB_REPO = 'catalogue'
-        //     }
-        //     steps {
-        //         sh '''
-        //         curl -s \
-        //         -H "Authorization: Bearer ${GITHUB_TOKEN}" \
-        //         -H "Accept: application/vnd.github+json" \
-        //         ${GITHUB_API}/repos/${GIT_OWNER}/${GITHUB_REPO}/dependabot/alerts
+        stage('Dependabot Alerts') {
+            environment {
+                GITHUB_TOKEN = credentials('github-token')
+                GIT_OWNER = 'rohith1845'
+                GITHUB_API = 'https://api.github.com'
+                GITHUB_REPO = 'catalogue'
+            }
+            steps {
+                sh '''
+                curl -s \
+                -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+                -H "Accept: application/vnd.github+json" \
+                ${GITHUB_API}/repos/${GIT_OWNER}/${GITHUB_REPO}/dependabot/alerts
 
-        //         echo "${response}" > dependabot_alerts.json
+                echo "${response}" > dependabot_alerts.json
 
-        //             high_critical_open_count=$(echo "${response}" | jq '[.[] 
-        //                 | select(
-        //                     .state == "open"
-        //                     and (.security_advisory.severity == "high"
-        //                         or .security_advisory.severity == "critical")
-        //                 )
-        //             ] | length')
+                    high_critical_open_count=$(echo "${response}" | jq '[.[] 
+                        | select(
+                            .state == "open"
+                            and (.security_advisory.severity == "high"
+                                or .security_advisory.severity == "critical")
+                        )
+                    ] | length')
 
-        //             echo "Open HIGH/CRITICAL Dependabot alerts: ${high_critical_open_count}"
+                    echo "Open HIGH/CRITICAL Dependabot alerts: ${high_critical_open_count}"
 
-        //             if [ "${high_critical_open_count}" -gt 0 ]; then
-        //                 echo "❌ Blocking pipeline due to OPEN HIGH/CRITICAL Dependabot alerts"
-        //                 echo "Affected dependencies:"
-        //                 echo "$response" | jq '.[] 
-        //                 | select(.state=="open" 
-        //                 and (.security_advisory.severity=="high" 
-        //                 or .security_advisory.severity=="critical"))
-        //                 | {dependency: .dependency.package.name, severity: .security_advisory.severity, advisory: .security_advisory.summary}'
-        //                 exit 1
-        //             else
-        //                 echo "✅ No OPEN HIGH/CRITICAL Dependabot alerts found"
-        //             fi
-        //         '''
-        //     }
-        // }
-        // stage('Trivy scan'){
-        //     steps{
-        //         script{
-        //             sh """
-        //                 trivy image \
-        //                 --scanner vuln \
-        //                 --severity HIGH,CRITICAL,MEDIUM \
-        //                 --exit-code 1 \
-        //                 --skip-db-update \
-        //                 --format table \
-        //                 ${ACC_ID}.dkr.ecr.us-east-1.amazonaws.com/${PROJECT}/${COMPONENT}:${appVersion}
-        //             """
-        //         }
-        //     }
-        // }
+                    if [ "${high_critical_open_count}" -gt 0 ]; then
+                        echo "❌ Blocking pipeline due to OPEN HIGH/CRITICAL Dependabot alerts"
+                        echo "Affected dependencies:"
+                        echo "$response" | jq '.[] 
+                        | select(.state=="open" 
+                        and (.security_advisory.severity=="high" 
+                        or .security_advisory.severity=="critical"))
+                        | {dependency: .dependency.package.name, severity: .security_advisory.severity, advisory: .security_advisory.summary}'
+                        exit 1
+                    else
+                        echo "✅ No OPEN HIGH/CRITICAL Dependabot alerts found"
+                    fi
+                '''
+            }
+        }
+        stage('Trivy scan'){
+            steps{
+                script{
+                    sh """
+                        trivy image \
+                        --scanner vuln \
+                        --severity HIGH,CRITICAL,MEDIUM \
+                        --exit-code 1 \
+                        --skip-db-update \
+                        --format table \
+                        ${ACC_ID}.dkr.ecr.us-east-1.amazonaws.com/${PROJECT}/${COMPONENT}:${appVersion}
+                    """
+                }
+            }
+        }
 
     }
     post{
